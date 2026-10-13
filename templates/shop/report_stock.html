@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <h1 class="h4 m-0">Current stock</h1>
+  <div class="stat py-2 px-3"><span class="stat-label">Total stock value</span> <strong>₹{{ stock_value|floatformat:2 }}</strong></div>
+</div>
+<div class="card"><div class="table-responsive"><table class="table align-middle mb-0">
+  <thead><tr><th>Product</th><th class="text-end">Stock</th><th class="text-end">Minimum</th><th class="text-end">Purchase price</th><th class="text-end">Stock value</th><th>Status</th></tr></thead>
+  {% for p in products %}
+    <tr><td>{{ p.name }}</td><td class="text-end">{{ p.stock }}</td><td class="text-end">{{ p.min_stock }}</td>
+      <td class="text-end">₹{{ p.purchase_price|floatformat:2 }}</td><td class="text-end">₹{{ p.stock_value|floatformat:2 }}</td>
+      <td>{% if p.is_low %}<span class="badge text-bg-danger">Low stock</span>{% else %}<span class="badge text-bg-success">OK</span>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="6" class="text-muted p-3">No products yet.</td></tr>{% endfor %}
+</table></div></div>
+{% endblock %}

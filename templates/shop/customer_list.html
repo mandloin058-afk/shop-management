@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <h1 class="h4 m-0">Customers / Udhaar</h1>
+  <a href="{% url 'customer_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add customer</a>
+</div>
+<div class="card"><div class="table-responsive"><table class="table align-middle mb-0">
+  <thead><tr><th>Name</th><th>Mobile</th><th class="text-end">Total udhaar</th><th class="text-end">Paid</th><th class="text-end">Remaining</th><th></th></tr></thead>
+  {% for c in object_list %}
+    <tr><td>{{ c.name }}</td><td>{{ c.mobile }}</td>
+      <td class="text-end">₹{{ c.total_amount|floatformat:2 }}</td><td class="text-end">₹{{ c.paid_amount|floatformat:2 }}</td>
+      <td class="text-end fw-bold {% if c.remaining > 0 %}text-danger{% endif %}">₹{{ c.remaining|floatformat:2 }}</td>
+      <td class="text-end text-nowrap">
+        <a href="{% url 'customer_detail' c.pk %}" class="btn btn-sm btn-outline-primary">Open</a>
+        <a href="{% url 'customer_edit' c.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+      </td></tr>
+  {% empty %}<tr><td colspan="6" class="text-muted p-3">No customers yet.</td></tr>{% endfor %}
+</table></div></div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <h1 class="h4 m-0">Products</h1>
+  <div class="d-flex gap-2 flex-wrap">
+    <form class="d-flex gap-2" method="get">
+      <input name="q" value="{{ q }}" class="form-control" placeholder="Search products">
+      <button class="btn btn-outline-secondary">Search</button>
+    </form>
+    <a href="{% url 'product_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add product</a>
+  </div>
+</div>
+<div class="card"><div class="table-responsive"><table class="table align-middle mb-0">
+  <thead><tr><th>Name</th><th class="text-end">Purchase price</th><th class="text-end">Selling price</th><th class="text-end">Stock</th><th class="text-end">Minimum</th><th></th></tr></thead>
+  {% for p in object_list %}
+    <tr>
+      <td>{{ p.name }}{% if p.is_low %} <span class="badge text-bg-danger">Low stock</span>{% endif %}</td>
+      <td class="text-end">₹{{ p.purchase_price|floatformat:2 }}</td>
+      <td class="text-end">₹{{ p.selling_price|floatformat:2 }}</td>
+      <td class="text-end">{{ p.stock }}</td><td class="text-end">{{ p.min_stock }}</td>
+      <td class="text-end text-nowrap">
+        <a href="{% url 'product_edit' p.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+        <a href="{% url 'product_delete' p.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+      </td>
+    </tr>
+  {% empty %}<tr><td colspan="6" class="text-muted p-3">No products yet. Add your first product.</td></tr>{% endfor %}
+</table></div></div>
+{% endblock %}

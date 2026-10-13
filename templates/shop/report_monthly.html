@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <h1 class="h4 m-0">Monthly report</h1>
+  <form method="get" class="d-flex gap-2">
+    <input type="month" name="month" value="{{ first|date:'Y-m' }}" class="form-control">
+    <button class="btn btn-primary">Show</button>
+  </form>
+</div>
+<p class="text-muted">{{ first|date:"F Y" }}</p>
+{% include "shop/_summary.html" %}
+<div class="card"><div class="card-header">Day-wise profit / loss</div><div class="table-responsive"><table class="table mb-0">
+  <thead><tr><th>Date</th><th class="text-end">Sales</th><th class="text-end">Purchases</th><th class="text-end">Expenses</th><th class="text-end">Gross profit</th><th class="text-end">Net profit</th></tr></thead>
+  {% for d in days %}
+    <tr><td>{{ d.date|date:"d M" }}</td><td class="text-end">₹{{ d.sales|floatformat:2 }}</td><td class="text-end">₹{{ d.purchases|floatformat:2 }}</td>
+      <td class="text-end">₹{{ d.expenses|floatformat:2 }}</td><td class="text-end">₹{{ d.gross|floatformat:2 }}</td>
+      <td class="text-end fw-bold {% if d.net < 0 %}text-danger{% else %}text-success{% endif %}">₹{{ d.net|floatformat:2 }}</td></tr>
+  {% empty %}<tr><td colspan="6" class="text-muted p-3">No activity this month.</td></tr>{% endfor %}
+</table></div></div>
+{% endblock %}

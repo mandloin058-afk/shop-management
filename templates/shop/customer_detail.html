@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <div><h1 class="h4 mb-0">{{ customer.name }}</h1><div class="text-muted">{{ customer.mobile }}</div></div>
+  <a href="{% url 'customer_list' %}" class="btn btn-light">Back</a>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-4"><div class="stat"><div class="stat-label">Total amount</div><div class="stat-value">₹{{ customer.total_amount|floatformat:2 }}</div></div></div>
+  <div class="col-4"><div class="stat"><div class="stat-label">Paid amount</div><div class="stat-value">₹{{ customer.paid_amount|floatformat:2 }}</div></div></div>
+  <div class="col-4"><div class="stat"><div class="stat-label">Remaining</div><div class="stat-value {% if customer.remaining > 0 %}text-danger{% endif %}">₹{{ customer.remaining|floatformat:2 }}</div></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card"><div class="card-header">Receive payment</div><div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3"><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+            {% for e in field.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}</div>
+        {% endfor %}
+        <button class="btn btn-primary w-100">Save payment</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card mb-3"><div class="card-header">Payment history</div>
+      <table class="table mb-0">
+        <thead><tr><th>Date</th><th>Note</th><th class="text-end">Amount</th></tr></thead>
+        {% for p in payments %}<tr><td>{{ p.date|date:"d M Y" }}</td><td>{{ p.note }}</td><td class="text-end">₹{{ p.amount|floatformat:2 }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-muted p-3">No payments yet.</td></tr>{% endfor %}
+      </table></div>
+    <div class="card"><div class="card-header">Udhaar purchases</div>
+      <table class="table mb-0">
+        <thead><tr><th>Date</th><th>Product</th><th class="text-end">Qty</th><th class="text-end">Total</th><th></th></tr></thead>
+        {% for s in udhaar_sales %}<tr><td>{{ s.date|date:"d M Y" }}</td><td>{{ s.product.name }}</td><td class="text-end">{{ s.quantity }}</td>
+          <td class="text-end">₹{{ s.total|floatformat:2 }}</td><td class="text-end"><a href="{% url 'sale_invoice' s.pk %}">Invoice</a></td></tr>
+        {% empty %}<tr><td colspan="5" class="text-muted p-3">No udhaar sales.</td></tr>{% endfor %}
+      </table></div>
+  </div>
+</div>
+{% endblock %}

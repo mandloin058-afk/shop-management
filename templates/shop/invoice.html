@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Invoice #{{ sale.pk }}{% endblock %}
+{% block content %}
+<div class="invoice card mx-auto"><div class="card-body p-4">
+  <div class="d-flex justify-content-between flex-wrap gap-2">
+    <div><h1 class="h4 mb-0">{{ shop_name }}</h1><div class="text-muted">Sales invoice</div></div>
+    <div class="text-end"><strong>Invoice #{{ sale.pk }}</strong><div>{{ sale.date|date:"d M Y" }}</div></div>
+  </div>
+  <hr>
+  <p class="mb-3">Customer: <strong>{% if sale.customer %}{{ sale.customer.name }} {{ sale.customer.mobile }}{% else %}Walk-in customer{% endif %}</strong></p>
+  <table class="table">
+    <thead><tr><th>Item</th><th class="text-end">Qty</th><th class="text-end">Price</th><th class="text-end">Amount</th></tr></thead>
+    <tr><td>{{ sale.product.name }}</td><td class="text-end">{{ sale.quantity }}</td>
+      <td class="text-end">₹{{ sale.selling_price|floatformat:2 }}</td><td class="text-end">₹{{ sale.subtotal|floatformat:2 }}</td></tr>
+    <tr><td colspan="3" class="text-end">Discount</td><td class="text-end">- ₹{{ sale.discount|floatformat:2 }}</td></tr>
+    <tr class="fw-bold"><td colspan="3" class="text-end">Total</td><td class="text-end">₹{{ sale.total|floatformat:2 }}</td></tr>
+  </table>
+  <p class="mb-0">Payment method: <strong>{{ sale.payment_method }}</strong>{% if sale.payment_method == 'Udhaar' %} (pay later){% endif %}</p>
+  <p class="text-center text-muted mt-4 mb-0">Thank you for shopping with us!</p>
+</div></div>
+<div class="text-center mt-3 no-print">
+  <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> Print invoice</button>
+  <a href="{% url 'sale_list' %}" class="btn btn-light">Back to sales</a>
+</div>
+{% endblock %}

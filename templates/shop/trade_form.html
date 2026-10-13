@@ -1,0 +1,7 @@
+{% extends "form.html" %}
+{% block after_form %}
+  {{ product_data|json_script:"products-data" }}
+  <div class="alert alert-light border mt-3 mb-0">
+    Stock now: <strong id="stock-info">-</strong> &nbsp;|&nbsp; Total: <strong id="total-info">₹0.00</strong>
+  </div>
+{% endblock %}

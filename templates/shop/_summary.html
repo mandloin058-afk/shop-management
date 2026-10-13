@@ -1,0 +1,7 @@
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg"><div class="stat"><div class="stat-label">Sales</div><div class="stat-value">₹{{ sm.sales|floatformat:2 }}</div></div></div>
+  <div class="col-6 col-lg"><div class="stat"><div class="stat-label">Purchases</div><div class="stat-value">₹{{ sm.purchases|floatformat:2 }}</div></div></div>
+  <div class="col-6 col-lg"><div class="stat"><div class="stat-label">Expenses</div><div class="stat-value">₹{{ sm.expenses|floatformat:2 }}</div></div></div>
+  <div class="col-6 col-lg"><div class="stat"><div class="stat-label">Gross profit</div><div class="stat-value {% if sm.gross < 0 %}text-danger{% endif %}">₹{{ sm.gross|floatformat:2 }}</div></div></div>
+  <div class="col-12 col-lg"><div class="stat stat-main"><div class="stat-label">Net profit / loss</div><div class="stat-value {% if sm.net < 0 %}text-danger{% else %}text-success{% endif %}">₹{{ sm.net|floatformat:2 }}</div></div></div>
+</div>
