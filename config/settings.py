@@ -8,7 +8,8 @@ load_dotenv(BASE_DIR / ".env")  # reads secrets from the .env file
 
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-key-change-me")
 DEBUG = os.getenv("DEBUG", "True") == "True"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") + [".vercel.app"]
+
 SHOP_NAME = os.getenv("SHOP_NAME", "My Shop")
 
 INSTALLED_APPS = [
