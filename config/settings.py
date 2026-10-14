@@ -50,13 +50,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+_db_host = os.getenv('DB_HOST', '127.0.0.1')
+_db_options = {}
+if 'tidbcloud.com' in _db_host:
+    import certifi
+    _db_options = {'ssl': {'ca': certifi.where()}}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'shop_management'),        'USER': os.getenv('DB_USER', 'root'),
+        'NAME': os.getenv('DB_NAME', 'shop_management'),
+        'USER': os.getenv('DB_USER', 'root'),
         'PASSWORD': os.getenv('DB_PASSWORD', '1234'),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'HOST': _db_host,
         'PORT': os.getenv('DB_PORT', '3306'),
+        'OPTIONS': _db_options,
     }
 }
 AUTH_PASSWORD_VALIDATORS = [
