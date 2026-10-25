@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import date
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
@@ -11,8 +12,9 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
-from .forms import CustomerForm, ExpenseForm, PaymentForm, ProductForm, PurchaseForm, SaleForm
-from .models import Customer, Expense, Payment, Product, Purchase, Sale, total_of
+from . import balance
+from .forms import AccountEntryForm, CustomerForm, ExpenseForm, PaymentForm, ProductForm, PurchaseForm, SaleForm
+from .models import AccountEntry, Customer, Expense, Payment, Product, Purchase, Sale, total_of
 
 
 # ---------- Small helpers ----------
@@ -298,4 +300,61 @@ def report_stock(request):
     products = Product.objects.all()
     return render(request, "shop/report_stock.html", {
         "products": products, "stock_value": sum(p.stock_value for p in products),
+    })
+
+
+# ---------- Accounts (cash, capital, loans ... entered by hand) ----------
+class AccountEntryList(LoginRequiredMixin, ListView):
+    model = AccountEntry
+    paginate_by = 20
+    template_name = "shop/account_entry_list.html"
+
+
+class AccountEntryCreate(FormPage, CreateView):
+    model, form_class, title = AccountEntry, AccountEntryForm, "Add account entry"
+    success_url = reverse_lazy("account_list")
+
+
+class AccountEntryUpdate(FormPage, UpdateView):
+    model, form_class, title = AccountEntry, AccountEntryForm, "Edit account entry"
+    success_url = reverse_lazy("account_list")
+
+
+class AccountEntryDelete(RemovePage):
+    model = AccountEntry
+    success_url = reverse_lazy("account_list")
+
+
+# ---------- Balance sheet ----------
+def stock_value_on(day):
+    """Value of stock in hand on the given day (today's figure uses the live stock)."""
+    products = Product.objects.all()
+    if day >= timezone.localdate():
+        return sum((p.stock_value for p in products), Decimal("0"))
+    bought = dict(Purchase.objects.filter(date__lte=day).values_list("product").annotate(q=Sum("quantity")).order_by())
+    sold = dict(Sale.objects.filter(date__lte=day).values_list("product").annotate(q=Sum("quantity")).order_by())
+    return sum((max(0, bought.get(p.pk, 0) - sold.get(p.pk, 0)) * p.purchase_price for p in products), Decimal("0"))
+
+
+def balance_sheet_on(day):
+    manual = {r["kind"]: r["s"] for r in
+              AccountEntry.objects.filter(date__lte=day).values("kind").annotate(s=Sum("amount")).order_by()}
+    receivable = (total_of(Sale.objects.filter(payment_method="Udhaar", date__lte=day))
+                  - total_of(Payment.objects.filter(date__lte=day), "amount"))
+    earned = (total_of(Sale.objects.filter(date__lte=day), "profit")
+              - total_of(Expense.objects.filter(date__lte=day), "amount"))
+    return balance.compute(manual, receivable, stock_value_on(day), earned)
+
+
+@login_required
+def report_balance_sheet(request):
+    today = timezone.localdate()
+    day = get_date(request.GET.get("date"), today)
+    compare = get_date(request.GET.get("compare"), None)
+    dates = [day] + ([compare] if compare else [])
+    columns = [balance_sheet_on(d) for d in dates]
+    return render(request, "shop/balance_sheet.html", {
+        "dates": dates, "day": day, "compare": compare,
+        "rows": balance.rows(columns), "main": columns[0],
+        "shop_name": settings.SHOP_NAME,
     })

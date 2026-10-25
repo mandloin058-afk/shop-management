@@ -13,6 +13,21 @@ TOTAL = dict(max_digits=12, decimal_places=2, default=0, editable=False)
 PAYMENT_METHODS = [("Cash", "Cash"), ("UPI", "UPI"), ("Card", "Card"), ("Udhaar", "Udhaar")]
 EXPENSE_CATEGORIES = [(c, c) for c in ("Rent", "Electricity", "Transport", "Packaging", "Repairs", "Other")]
 
+# Balance-sheet items that the shop owner enters by hand (everything else is worked out from sales/purchases)
+ENTRY_KINDS = [
+    ("cash", "Cash / Bank balance"),
+    ("other_current_asset", "Other current assets"),
+    ("ppe", "Property, plant and equipment"),
+    ("accumulated_depreciation", "Accumulated depreciation"),
+    ("accounts_payable", "Accounts payable (suppliers ko baki)"),
+    ("customer_credit", "Customer credit (customer ka advance)"),
+    ("tax_payable", "Tax payable (GST)"),
+    ("other_current_liability", "Other current liabilities"),
+    ("long_term_debt", "Long term debt (loan)"),
+    ("equity_capital", "Equity capital"),
+    ("retained_earnings_opening", "Retained earnings (pehle ka)"),
+]
+
 
 def total_of(queryset, field="total"):
     """Sum a field of a queryset (0 if empty)."""
@@ -151,3 +166,21 @@ class Expense(models.Model):
 
     class Meta:
         ordering = ["-date", "-id"]
+
+
+class AccountEntry(models.Model):
+    """A balance-sheet figure entered by hand: cash, capital, loan, supplier dues, etc.
+
+    Entries add up. Use a minus amount to reduce a figure (e.g. cash taken out).
+    """
+    kind = models.CharField(max_length=30, choices=ENTRY_KINDS)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    date = models.DateField(default=timezone.localdate)
+    note = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-date", "-id"]
+
+    def __str__(self):
+        return f"{self.get_kind_display()}: {self.amount}"

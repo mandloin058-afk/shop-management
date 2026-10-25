@@ -24,11 +24,13 @@
     <a class="nav-link" href="{% url 'sale_list' %}"><i class="bi bi-receipt"></i> Sales</a>
     <a class="nav-link" href="{% url 'customer_list' %}"><i class="bi bi-people"></i> Customers / Udhaar</a>
     <a class="nav-link" href="{% url 'expense_list' %}"><i class="bi bi-wallet2"></i> Expenses</a>
+    <a class="nav-link" href="{% url 'account_list' %}"><i class="bi bi-bank"></i> Accounts (cash, capital, loan)</a>
     <div class="nav-group">Reports</div>
     <a class="nav-link sub" href="{% url 'report_daily' %}">Daily report</a>
     <a class="nav-link sub" href="{% url 'report_monthly' %}">Monthly report</a>
     <a class="nav-link sub" href="{% url 'report_products' %}">Product-wise sales</a>
     <a class="nav-link sub" href="{% url 'report_stock' %}">Current stock</a>
+    <a class="nav-link sub" href="{% url 'report_balance_sheet' %}">Balance Sheet</a>
     <form method="post" action="{% url 'logout' %}" class="mt-auto pt-3">
       {% csrf_token %}
       <div class="small text-white-50 mb-2">Signed in as {{ user.username }}</div>

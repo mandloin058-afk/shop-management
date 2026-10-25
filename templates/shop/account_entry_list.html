@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <h1 class="h4 m-0">Accounts (cash, capital, loan)</h1>
+  <a href="{% url 'account_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add entry</a>
+</div>
+<div class="alert alert-info">
+  Balance Sheet ke wo figures yahan bharo jo sales/purchases se apne aap nahi nikalte:
+  cash/bank, capital, loan, suppliers ko baki, GST payable, aadi.
+  Har entry pichhli entries mein judti hai. Kuch ghatana ho to minus (-) amount likho.
+  <a href="{% url 'report_balance_sheet' %}" class="alert-link">Balance Sheet dekho</a>
+</div>
+<div class="card"><div class="table-responsive"><table class="table align-middle mb-0">
+  <thead><tr><th>Date</th><th>Kya hai</th><th>Note</th><th class="text-end">Amount</th><th></th></tr></thead>
+  {% for e in object_list %}
+    <tr><td>{{ e.date|date:"d M Y" }}</td><td>{{ e.get_kind_display }}</td><td>{{ e.note }}</td>
+      <td class="text-end fw-bold">₹{{ e.amount|floatformat:2 }}</td>
+      <td class="text-end text-nowrap">
+        <a href="{% url 'account_edit' e.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+        <a href="{% url 'account_delete' e.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+      </td></tr>
+  {% empty %}<tr><td colspan="5" class="text-muted p-3">Abhi koi entry nahi hai.</td></tr>{% endfor %}
+</table></div></div>
+{% include "shop/_pager.html" %}
+{% endblock %}

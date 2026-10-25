@@ -10,6 +10,9 @@ SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-key-change-me")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") + [".vercel.app"]
 CSRF_TRUSTED_ORIGINS = ["https://*.vercel.app"]
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SHOP_NAME = os.getenv("SHOP_NAME", "My Shop")
 
 INSTALLED_APPS = [

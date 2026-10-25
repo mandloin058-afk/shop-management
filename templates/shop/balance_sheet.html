@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load money %}
+{% block title %}Balance Sheet{% endblock %}
+{% block content %}
+<style>
+  .bs { max-width: 820px; }
+  .bs td, .bs th { padding: .35rem 1rem; }
+  .bs .head td { font-weight: 700; padding-top: 1rem; }
+  .bs .sub td { padding-top: .6rem; }
+  .bs .item td:first-child { padding-left: 2rem; }
+  .bs .total td { font-weight: 500; border-top: 1px solid #1c2623; }
+  .bs .grand td { font-weight: 700; border-top: 1px solid #1c2623; border-bottom: 3px double #1c2623; }
+  .bs .num { text-align: right; white-space: nowrap; }
+  .bs .item .num { color: #1d4ed8; }
+  @media print { .bs .item .num { color: #000; } }
+</style>
+
+<div class="page-head no-print">
+  <h1 class="h4 m-0">Balance Sheet</h1>
+  <form method="get" class="d-flex gap-2 flex-wrap align-items-end">
+    <div><label class="form-label small mb-0">Is tareekh tak</label>
+      <input type="date" name="date" value="{{ day|date:'Y-m-d' }}" class="form-control"></div>
+    <div><label class="form-label small mb-0">Taqabla (zaroori nahi)</label>
+      <input type="date" name="compare" value="{{ compare|date:'Y-m-d' }}" class="form-control"></div>
+    <button class="btn btn-primary">Dikhao</button>
+    <button type="button" class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer"></i> Print / PDF</button>
+  </form>
+</div>
+
+{% if main.difference != 0 %}
+  <div class="alert alert-warning no-print">
+    Total assets aur Total liabilities + equity barabar nahi hain, farak <strong>{{ main.difference|inr }}</strong> hai.
+    <a href="{% url 'account_list' %}" class="alert-link">Accounts</a> mein cash, capital, loan aur suppliers ka baki check karo.
+  </div>
+{% else %}
+  <div class="alert alert-success no-print">Balance Sheet match ho gayi: dono taraf ka total barabar hai.</div>
+{% endif %}
+
+<div class="card bs"><div class="card-body">
+  <h2 class="h3 mb-0">Balance Sheet</h2>
+  <div class="fw-bold">{{ shop_name }}</div>
+  <div class="text-muted mb-3">(in Indian Rupees, ₹)</div>
+  <table class="table table-borderless mb-0">
+    <thead><tr><th></th>{% for d in dates %}<th class="num">As on {{ d|date:"d M Y" }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr class="{{ r.kind }}">
+        <td>{{ r.label }}</td>
+        {% if r.cells %}{% for c in r.cells %}<td class="num">{{ c|inr }}</td>{% endfor %}
+        {% else %}{% for d in dates %}<td></td>{% endfor %}{% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+
+<p class="text-muted small mt-3 no-print" style="max-width:820px">
+  Munafa = bikri minus maal ki cost (average cost se) minus kharcha. Receivable customers ke baki udhaar se,
+  inventory stock × cost se nikalta hai. Baaki figures Accounts page se aate hain.
+  Final balance sheet apne CA ya GST salahkar se zaroor check karao.
+</p>
+{% endblock %}

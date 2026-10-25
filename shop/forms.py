@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Customer, Expense, Payment, Product, Purchase, Sale
+from .models import AccountEntry, Customer, Expense, Payment, Product, Purchase, Sale
 
 DATE = forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
 
@@ -76,3 +76,18 @@ class ExpenseForm(StyledForm):
         model = Expense
         fields = ["date", "category", "amount", "description"]
         widgets = {"date": DATE}
+
+
+class AccountEntryForm(StyledForm):
+    class Meta:
+        model = AccountEntry
+        fields = ["date", "kind", "amount", "note"]
+        widgets = {"date": DATE}
+        labels = {"kind": "Kya hai", "amount": "Amount (₹)", "note": "Note (zaroori nahi)"}
+        help_texts = {"amount": "Badhane ke liye seedha amount likho, ghatane ke liye minus (-) lagao."}
+
+    def clean_amount(self):
+        amount = self.cleaned_data["amount"]
+        if amount == 0:
+            raise forms.ValidationError("Amount zero nahi ho sakta.")
+        return amount

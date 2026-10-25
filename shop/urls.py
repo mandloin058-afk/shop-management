@@ -33,4 +33,10 @@ urlpatterns = [
     path("reports/monthly/", v.report_monthly, name="report_monthly"),
     path("reports/products/", v.report_products, name="report_products"),
     path("reports/stock/", v.report_stock, name="report_stock"),
+    path("reports/balance-sheet/", v.report_balance_sheet, name="report_balance_sheet"),
+
+    path("accounts/", v.AccountEntryList.as_view(), name="account_list"),
+    path("accounts/add/", v.AccountEntryCreate.as_view(), name="account_add"),
+    path("accounts/<int:pk>/edit/", v.AccountEntryUpdate.as_view(), name="account_edit"),
+    path("accounts/<int:pk>/delete/", v.AccountEntryDelete.as_view(), name="account_delete"),
 ]
